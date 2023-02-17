@@ -1,9 +1,8 @@
 # John Goza
 # Lab 1 - Strassen's algorithm
 import re
+from operator import add
 
-matrix_a = [[2, 1], [1, 5]]
-matrix_b = [[6, 7], [4, 3]]
 
 # format_matrix(order: int, matrix: flat array)
 # takes a flat array of matrix values in row major order and maps them to a nested array
@@ -72,36 +71,82 @@ def parse_matrix_file(filename):
         raise e
 
 
-def partition_matrix(order, whole_matrix):
-    # whole_matrix = [[1, 1, 1, 1, 11, 11, 11, 11], [2, 2, 2, 2, 22, 22, 22, 22], [3, 3, 3, 3, 33, 33, 33, 33], [4, 4, 4, 4, 44, 44, 44, 44],
-    #              [5, 5, 5, 5, 55, 55, 55, 55], [6, 6, 6, 6, 66, 66, 66, 66], [7, 7, 7, 7, 77, 77, 77, 77], [8, 8, 8, 8, 88, 88, 88, 88]]
-
-    half_len = int(order / 2)
-    # if half_len == 1:
-    #     return whole_matrix
-
+def partition_matrix(matrix):
     quadrants = [[], [], [], []]
 
-    for i in range(0, order):
+    half_len = int(len(matrix) / 2)
+    for i in range(0, len(matrix)):
         if i < half_len:
-            quadrants[0].append(whole_matrix[i][0:half_len])
-            quadrants[1].append(whole_matrix[i][half_len:])
+            quadrants[0].append(matrix[i][0:half_len])
+            quadrants[1].append(matrix[i][half_len:])
         else:
-            quadrants[2].append(whole_matrix[i][0:half_len])
-            quadrants[3].append(whole_matrix[i][half_len:])
+            quadrants[2].append(matrix[i][0:half_len])
+            quadrants[3].append(matrix[i][half_len:])
 
-    return quadrants
+    return quadrants[0], quadrants[1], quadrants[2], quadrants[3]
+
+
+def rebuild_rows(matrix1, matrix2):
+    return [row1 + row2 for row1, row2 in zip(matrix1, matrix2)]
+
+
+# todo: cite https://stackoverflow.com/questions/18713321/element-wise-addition-of-2-lists
+def sum_result(matrix1, matrix2):
+    sum_matrix = []
+    for i in range(len(matrix1)):
+        sum_matrix.append(list(map(add, matrix1[i], matrix2[i])))
+
+    return sum_matrix
+
+
+def recursive_multiply_matrix(matrix1, matrix2):
+    if not matrix1:
+        raise Exception
+
+    if isinstance(matrix1, int):
+        return matrix1 * matrix2
+    if len(matrix1) == 1:
+        # has to be double wrapped so that [i][j] access does not throw an error
+        return [[matrix1[0][0] * matrix2[0][0]]]
+
+    a00, a01, a10, a11 = partition_matrix(matrix1)
+    b00, b01, b10, b11 = partition_matrix(matrix2)
+
+    c00 = sum_result(recursive_multiply_matrix(a00, b00), recursive_multiply_matrix(a01, b10))
+    c01 = sum_result(recursive_multiply_matrix(a00, b01), recursive_multiply_matrix(a01, b11))
+    c10 = sum_result(recursive_multiply_matrix(a10, b00), recursive_multiply_matrix(a11, b10))
+    c11 = sum_result(recursive_multiply_matrix(a10, b01), recursive_multiply_matrix(a11, b11))
+
+    print(c00)
+    print(c01)
+    ans = rebuild_rows(c00, c01) + rebuild_rows(c10, c11)
+
+    return ans
+
+
+def strassen_multiply_matrix(matrix1, matrix2):
+    if not matrix1 or not matrix2:
+        raise Exception
+
+    if isinstance(matrix1, int):
+        return matrix1 * matrix2
+    if len(matrix1) == 1:
+        # has to be double wrapped so that [i][j] access does not throw an error
+        return [[matrix1[0][0] * matrix2[0][0]]]
+
+    a00, a01, a10, a11 = partition_matrix(matrix1)
+    b00, b01, b10, b11 = partition_matrix(matrix2)
+
+    return a00, a01, a10, a11
 
 
 if __name__ == "__main__":
-    order = 2
-    matrix1 = [[2,1], [1,5]]
-    matrix2 = [[6,7], [4,3]]
-    # whole_matrix = [[1,1,11,11],[2,2,22,22],[3,3,33,33],[4,4,44,44]]
-    # whole_matrix = [[1, 1, 1, 1, 11, 11, 11, 11], [2, 2, 2, 2, 22, 22, 22, 22], [3, 3, 3, 3, 33, 33, 33, 33], [4, 4, 4, 4, 44, 44, 44, 44],
-    #              [5, 5, 5, 5, 55, 55, 55, 55], [6, 6, 6, 6, 66, 66, 66, 66], [7, 7, 7, 7, 77, 77, 77, 77], [8, 8, 8, 8, 88, 88, 88, 88]]
-    # order, matrix1, matrix2 = parse_matrix_file('input.txt')
-    split_matrix1 = partition_matrix(order, matrix1)
-    split_matrix2 = partition_matrix(order, matrix2)
-    print(split_matrix1)
-    print(split_matrix2)
+    # matrix1 = [[2,1], [1,5]]
+    # matrix2 = [[6,7], [4,3]]
+    # # ans should be [[16, 17], [26, 22]]
+
+    input_matrix_1 = [[1, 1, 11, 11], [2, 2, 22, 22], [3, 3, 33, 33], [4, 4, 44, 44]]
+    input_matrix_2 = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
+    # ans should be [[24, 24, 24, 24], [48, 48, 48, 48], [72, 72, 72, 72], [96, 96, 96, 96]]
+
+    print(recursive_multiply_matrix(input_matrix_1, input_matrix_2))
