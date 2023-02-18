@@ -1,183 +1,78 @@
 # John Goza
 # Lab 1 - Strassen's algorithm
-# Type single nested array can be interpreted as an array containing n sub arrays, where each sub array _should_
+# No re-use or reproduction allowed. All rights retained by John Goza.
+
+# NOTE ON TYPE DEFS:
+# Type "single nested array" can be interpreted as an array containing n sub arrays, where each sub array _should_
 # contain n integers or strings.
 
-###
-import re
 from operator import add, sub
+from modules.matrix_parser import parse_matrix_file
+from modules.matrix_functions import do_math, partition_matrix, rebuild_rows
+from modules.output_handler import output_error, output_success
 
 
-# format_matrix(order: int, matrix: flat array) returns formatted_matrix: single nested array
-# takes a flat array of matrix values in row major order and maps them to a nested array
-# where each index of the array contains one row of the matrix, and each secondary index is
-# a column in that row. e.g. [1 2 3 4] => [[1, 2], [3, 4]]
-def format_matrix(order, matrix):
-    formatted_matrix = []
-    # God bless python for being a zero-indexed language but dang this is annoying
-    for i in range(1, order + 1):
-        upper_bound = order * i
-        lower_bound = upper_bound - order
-        formatted_matrix.append(matrix[lower_bound:upper_bound])
-    return formatted_matrix
-
-
-# validate_input_matrix_constraints(input_matrix: single nested array) returns None
-# throws Exception if constraints are not met
-# Checks that a given matrix is both n x n and that n is an exact power of 2
-def validate_matrix_constraints(input_matrix):
-    row_count = len(input_matrix)
-
-    # todo: cite: https://stackoverflow.com/questions/57025836/how-to-check-if-a-given-number-is-a-power-of-two
-    if (row_count & (row_count - 1) != 0) or row_count == 0:
-        raise Exception("Invalid input given! Matrix is not an exact power of two!")
-
-    # Validate row length == column length for all columns
-    for row in input_matrix:
-        if len(row) != row_count:
-            raise Exception("Invalid input given! Rows and columns differ in length.")
-
-
-# A file with required input is provided. All input you create should be formatted the same: the
-# first line should contain the order of the matrix, then the first matrix, in row major order, then
-# the second matrix. This is followed by a blank line, then the order of the next matrix pair and
-# so on.
-
-# parse_matrix_file(filename: string) returns first_matrix: single nested matrix, second_matrix: single nested matrix
-# catches and re-throws exceptions from IO errors, invalid file formatting, and invalid matrix sizes / order
-def parse_matrix_file(filename):
-    try:
-        # todo: cite? https://docs.python.org/3/tutorial/inputoutput.html
-        file = open(filename, 'r', encoding='utf-8')
-        matrix_order_str = file.readline().strip()
-        first_matrix_string = file.readline().strip()
-        second_matrix_string = file.readline().strip()
-
-        reg = re.compile(r"(\d*)x(\d*)")
-        order_string = reg.search(matrix_order_str).groups()
-        if not order_string \
-                or order_string[0] != order_string[1] \
-                or not order_string[0].isdigit():
-            raise Exception(f"Order string is invalid! Given: {matrix_order_str}")
-
-        order = int(order_string[0])
-
-        if (order & (order - 1) != 0):
-            raise Exception(f"Order is not an exact power of two! Given: {matrix_order_str}")
-
-        first_flat_matrix = list(map(int, first_matrix_string.split()))
-        second_flat_matrix = list(map(int, second_matrix_string.split()))
-
-        first_matrix = format_matrix(order, first_flat_matrix)
-        second_matrix = format_matrix(order, second_flat_matrix)
-
-        validate_matrix_constraints(first_matrix)
-        validate_matrix_constraints(second_matrix)
-
-        return first_matrix, second_matrix
-    except Exception as e:
-        print("File parsing failed")
-        raise e
-
-
-# partition_matrix(matrix: single nested matrix)
-# returns quadrants[0], quadrants[1], quadrants[2], quadrants[3]: all single nested matrices
-# takes an n x n matrix and splits it into four quadrants.
-# e.g. [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3], [4, 4, 4, 4]] would return
-#      [[1, 1], [2, 2]]      [[1, 1], [2, 2]]     [[3, 3], [4, 4]]     [[3, 3], [4, 4]]
-def partition_matrix(matrix):
-    quadrants = [[], [], [], []]
-
-    half_len = int(len(matrix) / 2)
-    for i in range(0, len(matrix)):
-        if i < half_len:
-            quadrants[0].append(matrix[i][0:half_len])
-            quadrants[1].append(matrix[i][half_len:])
-        else:
-            quadrants[2].append(matrix[i][0:half_len])
-            quadrants[3].append(matrix[i][half_len:])
-
-    return quadrants[0], quadrants[1], quadrants[2], quadrants[3]
-
-
-# rebuild_rows(matrix1: single nested matrix, matrix2: single nested matrix)
-# returns single nested matrix with each row in matrix2 appended to its corresponding row in matrix1
-# e.g. given matrix1=[[72, 72], [96, 96]], matrix2=[[72, 72], [96, 96]], it outputs [[72, 72, 72, 72], [96, 96, 96, 96]]
-def rebuild_rows(matrix1, matrix2):
-    return [row1 + row2 for row1, row2 in zip(matrix1, matrix2)]
-
-
-# def do_math(operand: Python operator, matrix1: single nested matrix, matrix2: single nested matrix)
-# returns resulting_matrix: single nested matrix
-# applies the supplied math operator (add, sub) element by element across the two input matrices
-# e.g. given operand=add, matrix1=[[5, 7], [1, 2]], matrix2=[[3, 4], [8, 13]], it outputs [[8, 11], [9, 15]]
-# e.g. given operand=sub, matrix1=[[5, 7], [1, 2]], matrix2=[[3, 4], [8, 13]], it outputs [[2, 3], [-7, -11]]
-# todo: cite https://stackoverflow.com/questions/18713321/element-wise-addition-of-2-lists
-def do_math(operand, matrix1, matrix2):
+# def multiply_matrix(matrix1: single nested array, matrix2: single nested array)
+# returns resulting_matrix: single nested array
+def multiply_matrix(matrix1, matrix2):
+    count = 0
+    n = len(matrix1)
     resulting_matrix = []
-    for i in range(len(matrix1)):
-        resulting_matrix.append(list(map(operand, matrix1[i], matrix2[i])))
 
-    return resulting_matrix
+    for i in range(0, n):
+        row_result = []
 
+        for j in range(0, n):
+            acc = 0
 
-def recursive_multiply_matrix(matrix1, matrix2):
-    if not matrix1:
-        raise Exception
+            for k in range(0, n):
+                count += 1
+                acc += matrix1[i][k] * matrix2[k][j]
 
-    if len(matrix1) == 1:
-        # has to be double wrapped so that [i][j] access does not throw an error
-        return [[matrix1[0][0] * matrix2[0][0]]]
+            row_result.append(acc)
 
-    a00, a01, a10, a11 = partition_matrix(matrix1)
-    b00, b01, b10, b11 = partition_matrix(matrix2)
+        resulting_matrix.append(row_result)
+    return count, resulting_matrix
 
-    c00 = do_math(add, recursive_multiply_matrix(a00, b00), recursive_multiply_matrix(a01, b10))
-    c01 = do_math(add, recursive_multiply_matrix(a00, b01), recursive_multiply_matrix(a01, b11))
-    c10 = do_math(add, recursive_multiply_matrix(a10, b00), recursive_multiply_matrix(a11, b10))
-    c11 = do_math(add, recursive_multiply_matrix(a10, b01), recursive_multiply_matrix(a11, b11))
-
-    return rebuild_rows(c00, c01) + rebuild_rows(c10, c11)
-
-
+# def multiply_matrix(matrix1: single nested array, matrix2: single nested array)
+# returns resulting_matrix: single nested array
 def strassen_multiply_matrix(matrix1, matrix2):
     if not matrix1 or not matrix2:
         raise Exception
 
     if len(matrix1) == 1:
+        # return a 1 for counting, and the result
         # has to be double wrapped so that [i][j] access does not throw an error
-        return [[matrix1[0][0] * matrix2[0][0]]]
+        return 1, [[matrix1[0][0] * matrix2[0][0]]]
 
     a00, a01, a10, a11 = partition_matrix(matrix1)
     b00, b01, b10, b11 = partition_matrix(matrix2)
 
-    p1 = strassen_multiply_matrix(a00, do_math(sub, b01, b11))
-    p2 = strassen_multiply_matrix(do_math(add, a00, a01), b11)
-    p3 = strassen_multiply_matrix(do_math(add, a10, a11), b00)
-    p4 = strassen_multiply_matrix(a11, do_math(sub, b10, b00))
-    p5 = strassen_multiply_matrix(do_math(add, a00, a11), do_math(add, b00, b11))
-    p6 = strassen_multiply_matrix(do_math(sub, a01, a11), do_math(add, b10, b11))
-    p7 = strassen_multiply_matrix(do_math(sub, a00, a10), do_math(add, b00, b01))
+    count1, p1 = strassen_multiply_matrix(a00, do_math(sub, b01, b11))
+    count2, p2 = strassen_multiply_matrix(do_math(add, a00, a01), b11)
+    count3, p3 = strassen_multiply_matrix(do_math(add, a10, a11), b00)
+    count4, p4 = strassen_multiply_matrix(a11, do_math(sub, b10, b00))
+    count5, p5 = strassen_multiply_matrix(do_math(add, a00, a11), do_math(add, b00, b11))
+    count6, p6 = strassen_multiply_matrix(do_math(sub, a01, a11), do_math(add, b10, b11))
+    count7, p7 = strassen_multiply_matrix(do_math(sub, a00, a10), do_math(add, b00, b01))
+
+    count_total = count1 + count2 + count3 + count4 + count5 + count6 + count7
 
     # c00 = do_math(sub, do_math(add, p5, p4), do_math(add, p2, p6))
     c00 = do_math(add, do_math(sub, do_math(add, p5, p4), p2), p6)
     c01 = do_math(add, p1, p2)
     c10 = do_math(add, p3, p4)
     c11 = do_math(sub, do_math(sub, do_math(add, p1, p5), p3), p7)
-    ans = rebuild_rows(c00, c01) + rebuild_rows(c10, c11)
-    return ans
+    return count_total, rebuild_rows(c00, c01) + rebuild_rows(c10, c11)
 
 
 if __name__ == "__main__":
-    # input_matrix_1 = [[2,1], [1,5]]
-    # input_matrix_2 = [[6,7], [4,3]]
-    # # ans should be [[16, 17], [26, 22]]
+    runnables = parse_matrix_file("input/input.txt")
+    for runnable in runnables:
+        if runnable['error'] != '':
+            output_error(runnable)
+            continue
 
-    input_matrix_1 = [[1, 1, 11, 11], [2, 2, 22, 22], [3, 3, 33, 33], [4, 4, 44, 44]]
-    input_matrix_2 = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
-    # ans should be [[24, 24, 24, 24], [48, 48, 48, 48], [72, 72, 72, 72], [96, 96, 96, 96]]
-
-    recursive_multiply_matrix(input_matrix_1, input_matrix_2)
-
-    # order, first_matrix, second_matrix = parse_matrix_file("input.txt")
-    # print(recursive_multiply_matrix(first_matrix, second_matrix))
+        ordinary_result = multiply_matrix(runnable['m1'], runnable['m2'])
+        strassen_result = strassen_multiply_matrix(runnable['m1'], runnable['m2'])
+        output_success(ordinary_result, strassen_result, runnable)
