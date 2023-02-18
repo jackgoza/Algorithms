@@ -1,7 +1,7 @@
 # John Goza
 # Lab 1 - Strassen's algorithm
 import re
-from operator import add
+from operator import add, sub
 
 
 # format_matrix(order: int, matrix: flat array)
@@ -91,10 +91,10 @@ def rebuild_rows(matrix1, matrix2):
 
 
 # todo: cite https://stackoverflow.com/questions/18713321/element-wise-addition-of-2-lists
-def sum_result(matrix1, matrix2):
+def do_math(operand, matrix1, matrix2):
     sum_matrix = []
     for i in range(len(matrix1)):
-        sum_matrix.append(list(map(add, matrix1[i], matrix2[i])))
+        sum_matrix.append(list(map(operand, matrix1[i], matrix2[i])))
 
     return sum_matrix
 
@@ -112,16 +112,12 @@ def recursive_multiply_matrix(matrix1, matrix2):
     a00, a01, a10, a11 = partition_matrix(matrix1)
     b00, b01, b10, b11 = partition_matrix(matrix2)
 
-    c00 = sum_result(recursive_multiply_matrix(a00, b00), recursive_multiply_matrix(a01, b10))
-    c01 = sum_result(recursive_multiply_matrix(a00, b01), recursive_multiply_matrix(a01, b11))
-    c10 = sum_result(recursive_multiply_matrix(a10, b00), recursive_multiply_matrix(a11, b10))
-    c11 = sum_result(recursive_multiply_matrix(a10, b01), recursive_multiply_matrix(a11, b11))
+    c00 = do_math(add, recursive_multiply_matrix(a00, b00), recursive_multiply_matrix(a01, b10))
+    c01 = do_math(add, recursive_multiply_matrix(a00, b01), recursive_multiply_matrix(a01, b11))
+    c10 = do_math(add, recursive_multiply_matrix(a10, b00), recursive_multiply_matrix(a11, b10))
+    c11 = do_math(add, recursive_multiply_matrix(a10, b01), recursive_multiply_matrix(a11, b11))
 
-    print(c00)
-    print(c01)
-    ans = rebuild_rows(c00, c01) + rebuild_rows(c10, c11)
-
-    return ans
+    return rebuild_rows(c00, c01) + rebuild_rows(c10, c11)
 
 
 def strassen_multiply_matrix(matrix1, matrix2):
@@ -137,7 +133,21 @@ def strassen_multiply_matrix(matrix1, matrix2):
     a00, a01, a10, a11 = partition_matrix(matrix1)
     b00, b01, b10, b11 = partition_matrix(matrix2)
 
-    return a00, a01, a10, a11
+    p1 = strassen_multiply_matrix(a00, do_math(sub, b01, b11))
+    p2 = strassen_multiply_matrix(do_math(add, a00, a01), b11)
+    p3 = strassen_multiply_matrix(do_math(add, a10, a11), b00)
+    p4 = strassen_multiply_matrix(a11, do_math(sub, b10, b00))
+    p5 = strassen_multiply_matrix(do_math(add, a00, a11), do_math(add, b00, b11))
+    p6 = strassen_multiply_matrix(do_math(sub, a01, a11), do_math(add, b10, b11))
+    p7 = strassen_multiply_matrix(do_math(sub, a00, a10), do_math(add, b00, b01))
+
+    c00 = do_math(sub, do_math(add, p5, p4), do_math(add, p2, p6))
+    c01 = do_math(add, p1, p2)
+    c10 = do_math(add, p3, p4)
+    c11 = do_math(sub, do_math(add, p1, p5), do_math(sub, p3, p7))
+    ans = rebuild_rows(c00, c01) + rebuild_rows(c10, c11)
+    print(ans)
+    return ans
 
 
 if __name__ == "__main__":
@@ -149,4 +159,4 @@ if __name__ == "__main__":
     input_matrix_2 = [[1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1]]
     # ans should be [[24, 24, 24, 24], [48, 48, 48, 48], [72, 72, 72, 72], [96, 96, 96, 96]]
 
-    print(recursive_multiply_matrix(input_matrix_1, input_matrix_2))
+    print(strassen_multiply_matrix(input_matrix_1, input_matrix_2))
