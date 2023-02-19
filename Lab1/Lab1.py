@@ -20,6 +20,7 @@ ingested matrix: {
             }
 """
 import argparse
+import os
 from operator import add, sub
 from modules.matrix_parser import parse_matrix_file
 from modules.matrix_functions import do_math, partition_matrix, rebuild_rows
@@ -101,10 +102,12 @@ if __name__ == "__main__":
 
     runnables = []
 
-    if args['test']:
+    if args['test'] == "true":
         runnables = parse_matrix_file("input/test_input.txt")
     else:
         runnables = parse_matrix_file("input/LabStrassenInput.txt")
+
+    os.remove("output/output.txt")
 
     for runnable in runnables:
         if runnable['error'] != '':

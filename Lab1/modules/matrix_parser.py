@@ -1,8 +1,6 @@
 # John Goza
 # Lab 1 - Strassen's algorithm
 # No re-use or reproduction allowed. All rights retained by John Goza.
-import json
-import re
 
 """
 TYPE DEFS:
@@ -41,23 +39,25 @@ def format_matrix(order, matrix):
     return formatted_matrix
 
 
-def validate_matrix_constraints(input_matrix):
+def validate_matrix_constraints(matrix_order, input_matrix):
     """
     Checks that a given matrix is both n x n and that n is an exact power of 2
-    :param input_matrix: single nested array
+    :param matrix_order: int
+    :param input_matrix: flat array
     :return: None
     :throws Exception if constraints are not met
     """
-    row_count = len(input_matrix)
-
     # todo: cite: https://stackoverflow.com/questions/57025836/how-to-check-if-a-given-number-is-a-power-of-two
-    if (row_count & (row_count - 1) != 0) or row_count == 0:
-        raise Exception("Invalid input given! Matrix is not an exact power of two!")
+    if (matrix_order & (matrix_order - 1) != 0) or matrix_order == 0:
+        raise Exception(f"Order is not an exact power of two! Given: {matrix_order}")
 
-    # Validate row length == column length for all columns
-    for row in input_matrix:
-        if len(row) != row_count:
-            raise Exception("Invalid input given! Rows and columns differ in length.")
+    expected_elements = matrix_order**2
+
+    if len(input_matrix) > expected_elements:
+        raise Exception("Invalid input given! Too many elements in matrix.")
+
+    if len(input_matrix) < expected_elements:
+        raise Exception("Invalid input given! Not enough elements in matrix.")
 
 
 # TODO: comment this method
@@ -66,32 +66,28 @@ def ingest_single_input(matrix_order, first_matrix_string, second_matrix_string)
     Parses, transforms and validates a single three line section of the input file.
     Catches exceptions raised during parsing and places them as a String on the returned object.
     This prevents consuming methods from needing try / except logic.
-    :param matrix_order_str: String
+    :param matrix_order: String
     :param first_matrix_string: String
     :param second_matrix_string: String
     :return: ingested matrix
     """
-    try:
-        if (matrix_order & (matrix_order - 1) != 0):
-            raise Exception(f"Order is not an exact power of two! Given: {matrix_order}")
 
+    inputs = {'matrix_order_str': matrix_order, 'first_matrix_string': first_matrix_string,
+              'second_matrix_string': second_matrix_string}
+
+    try:
         first_flat_matrix = list(map(int, first_matrix_string.split()))
         second_flat_matrix = list(map(int, second_matrix_string.split()))
+
+        validate_matrix_constraints(matrix_order, first_flat_matrix)
+        validate_matrix_constraints(matrix_order, second_flat_matrix)
 
         first_matrix = format_matrix(matrix_order, first_flat_matrix)
         second_matrix = format_matrix(matrix_order, second_flat_matrix)
 
-        validate_matrix_constraints(first_matrix)
-        validate_matrix_constraints(second_matrix)
-
-        return {'order': matrix_order, 'm1': first_matrix, 'm2': second_matrix, 'error': '',
-                'inputs': {'matrix_order_str': matrix_order,
-                           'first_matrix_string': first_matrix_string,
-                           'second_matrix_string': second_matrix_string}}
+        return {'order': matrix_order, 'm1': first_matrix, 'm2': second_matrix, 'error': '', 'inputs': inputs}
     except Exception as e:
-        return {'error': repr(e), 'inputs': {'matrix_order_str': matrix_order,
-                                             'first_matrix_string': first_matrix_string,
-                                             'second_matrix_string': second_matrix_string}}
+        return {'error': repr(e), 'inputs': inputs}
 
 
 def parse_matrix_file(filename):
@@ -116,7 +112,7 @@ def parse_matrix_file(filename):
                 # we are going to ignore lines beginning with '#' so that I can put comments in the test file
 
                 # if there are no matrix elements or an order string on a line
-                if line == '\n':
+                if line == '\n' or line.startswith("#"):
                     # if we're currently ingesting a matrix
                     if order != 0:
                         processed = ingest_single_input(order, ' '.join(matrix[:order]), ' '.join(matrix[order:]))
