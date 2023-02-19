@@ -4,9 +4,26 @@
 
 import re
 
+"""
+TYPE DEFS:
+
+single nested array: List of Lists, not nested more than one level
+
+ingested matrix: {
+                'order': String,
+                'm1': single nested array,
+                'm2': single nested array,
+                'error': String,
+                'inputs': {
+                    'matrix_order_string': String,
+                    'first_matrix_string': String,
+                    'second_matrix_string': String,
+                }
+            }
+"""
+
 
 def format_matrix(order, matrix):
-    # todo: change comments to match this, this is fuckin sweet
     """
     format_matrix takes a flat array of matrix values in row major order and maps them to a nested array
     where each index of the array contains one row of the matrix, and each secondary index is a column in that row.
@@ -24,10 +41,13 @@ def format_matrix(order, matrix):
     return formatted_matrix
 
 
-# validate_input_matrix_constraints(input_matrix: single nested array) returns None
-# throws Exception if constraints are not met
-# Checks that a given matrix is both n x n and that n is an exact power of 2
 def validate_matrix_constraints(input_matrix):
+    """
+    Checks that a given matrix is both n x n and that n is an exact power of 2
+    :param input_matrix: single nested array
+    :return: None
+    :throws Exception if constraints are not met
+    """
     row_count = len(input_matrix)
 
     # todo: cite: https://stackoverflow.com/questions/57025836/how-to-check-if-a-given-number-is-a-power-of-two
@@ -39,8 +59,18 @@ def validate_matrix_constraints(input_matrix):
         if len(row) != row_count:
             raise Exception("Invalid input given! Rows and columns differ in length.")
 
+
 # TODO: comment this method
 def ingest_single_input(matrix_order_str, first_matrix_string, second_matrix_string):
+    """
+    Parses, transforms and validates a single three line section of the input file.
+    Catches exceptions raised during parsing and places them as a String on the returned object.
+    This prevents consuming methods from needing try / except logic.
+    :param matrix_order_str: String
+    :param first_matrix_string: String
+    :param second_matrix_string: String
+    :return: ingested matrix
+    """
     try:
         reg = re.compile(r"(\d*)x(\d*)")
         order_string = reg.search(matrix_order_str).groups()
@@ -63,14 +93,26 @@ def ingest_single_input(matrix_order_str, first_matrix_string, second_matrix_str
         validate_matrix_constraints(first_matrix)
         validate_matrix_constraints(second_matrix)
 
-        return {'order': order_string, 'm1': first_matrix, 'm2': second_matrix, 'error': ''}
+        return {'order': order_string, 'm1': first_matrix, 'm2': second_matrix, 'error': '',
+                'inputs': {'matrix_order_str': matrix_order_str,
+                           'first_matrix_string': first_matrix_string,
+                           'second_matrix_string': second_matrix_string}}
     except Exception as e:
-        return {'order': matrix_order_str, 'm1': first_matrix_string, 'm2': second_matrix_string, 'error': repr(e)}
+        return {'error': repr(e), 'inputs': {'matrix_order_str': matrix_order_str,
+                                             'first_matrix_string': first_matrix_string,
+                                             'second_matrix_string': second_matrix_string}}
 
 
-# parse_matrix_file(filename: string) returns first_matrix: single nested array, second_matrix: single nested array
-# catches and re-throws exceptions from IO errors, invalid file formatting, and invalid matrix sizes / order
 def parse_matrix_file(filename):
+    """
+    Opens file for reading and splits into sets of 3. Those sets are mapped into an array of ingested matrix objects
+    via the ingest_single_input function. The mapped array is then returned. Errors other than IO will be returned as
+    a string on the specific object that had an error, thus valid order matrix matrix sets will still be processed.
+    :param filename: String
+    :return: List(ingested matrix)
+    :throws: Exception if file IO fails
+    """
+
     try:
         # todo: cite? https://docs.python.org/3/tutorial/inputoutput.html
         with open(filename, 'r', encoding='utf-8') as file_in:
