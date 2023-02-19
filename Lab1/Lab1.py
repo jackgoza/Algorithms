@@ -19,7 +19,7 @@ ingested matrix: {
                 }
             }
 """
-
+import argparse
 from operator import add, sub
 from modules.matrix_parser import parse_matrix_file
 from modules.matrix_functions import do_math, partition_matrix, rebuild_rows
@@ -95,7 +95,17 @@ def strassen_multiply_matrix(matrix1, matrix2):
 
 
 if __name__ == "__main__":
-    runnables = parse_matrix_file("input/input.txt")
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--test', default=False, required=False)
+    args = vars(arg_parser.parse_args())
+
+    runnables = []
+
+    if args['test']:
+        runnables = parse_matrix_file("input/test_input.txt")
+    else:
+        runnables = parse_matrix_file("input/LabStrassenInput.txt")
+
     for runnable in runnables:
         if runnable['error'] != '':
             output_error("output/output.txt", runnable)

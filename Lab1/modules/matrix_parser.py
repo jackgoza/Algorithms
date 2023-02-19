@@ -1,7 +1,7 @@
 # John Goza
 # Lab 1 - Strassen's algorithm
 # No re-use or reproduction allowed. All rights retained by John Goza.
-
+import json
 import re
 
 """
@@ -61,7 +61,7 @@ def validate_matrix_constraints(input_matrix):
 
 
 # TODO: comment this method
-def ingest_single_input(matrix_order_str, first_matrix_string, second_matrix_string):
+def ingest_single_input(matrix_order, first_matrix_string, second_matrix_string):
     """
     Parses, transforms and validates a single three line section of the input file.
     Catches exceptions raised during parsing and places them as a String on the returned object.
@@ -72,33 +72,24 @@ def ingest_single_input(matrix_order_str, first_matrix_string, second_matrix_str
     :return: ingested matrix
     """
     try:
-        reg = re.compile(r"(\d*)x(\d*)")
-        order_string = reg.search(matrix_order_str).groups()
-        if not order_string \
-                or order_string[0] != order_string[1] \
-                or not order_string[0].isdigit():
-            raise Exception(f"Order string is invalid! Given: {matrix_order_str}")
-
-        order = int(order_string[0])
-
-        if (order & (order - 1) != 0):
-            raise Exception(f"Order is not an exact power of two! Given: {matrix_order_str}")
+        if (matrix_order & (matrix_order - 1) != 0):
+            raise Exception(f"Order is not an exact power of two! Given: {matrix_order}")
 
         first_flat_matrix = list(map(int, first_matrix_string.split()))
         second_flat_matrix = list(map(int, second_matrix_string.split()))
 
-        first_matrix = format_matrix(order, first_flat_matrix)
-        second_matrix = format_matrix(order, second_flat_matrix)
+        first_matrix = format_matrix(matrix_order, first_flat_matrix)
+        second_matrix = format_matrix(matrix_order, second_flat_matrix)
 
         validate_matrix_constraints(first_matrix)
         validate_matrix_constraints(second_matrix)
 
-        return {'order': order_string, 'm1': first_matrix, 'm2': second_matrix, 'error': '',
-                'inputs': {'matrix_order_str': matrix_order_str,
+        return {'order': matrix_order, 'm1': first_matrix, 'm2': second_matrix, 'error': '',
+                'inputs': {'matrix_order_str': matrix_order,
                            'first_matrix_string': first_matrix_string,
                            'second_matrix_string': second_matrix_string}}
     except Exception as e:
-        return {'error': repr(e), 'inputs': {'matrix_order_str': matrix_order_str,
+        return {'error': repr(e), 'inputs': {'matrix_order_str': matrix_order,
                                              'first_matrix_string': first_matrix_string,
                                              'second_matrix_string': second_matrix_string}}
 
@@ -114,23 +105,40 @@ def parse_matrix_file(filename):
     """
 
     try:
-        # todo: cite? https://docs.python.org/3/tutorial/inputoutput.html
         with open(filename, 'r', encoding='utf-8') as file_in:
-            lines = file_in.readlines()
-            filtered = list(filter(lambda line: line != '\n', lines))
-
             inputs = []
 
-            for line1, line2, line3, in zip(*[iter(filtered)] * 3, strict=True):
-                matrix_order_str = line1.strip()
-                first_matrix_string = line2.strip()
-                second_matrix_string = line3.strip()
+            order = 0
+            matrix = []
 
-                ingested = ingest_single_input(matrix_order_str, first_matrix_string, second_matrix_string)
-                inputs.append(ingested)
+            while line := file_in.readline():
+                # first line should be the matrix order
+                # we are going to ignore lines beginning with '#' so that I can put comments in the test file
+
+                # if there are no matrix elements or an order string on a line
+                if line == '\n':
+                    # if we're currently ingesting a matrix
+                    if order != 0:
+                        processed = ingest_single_input(order, ' '.join(matrix[:order]), ' '.join(matrix[order:]))
+                        inputs.append(processed)
+                        order = 0
+                        matrix = []
+
+                    # go to next line
+                    continue
+
+                # if we are not currently ingesting a matrix
+                if order == 0:
+                    # set the order
+                    order = int(line.strip())
+                    # go to next line
+                    continue
+
+                # add matrix element to current ingestion
+                matrix.append(line.strip().replace("  ", " "))
 
             return inputs
 
     except Exception as e:
-        print("File parsing failed")
+        print(f"File parsing failed: {repr(e)}")
         raise e
