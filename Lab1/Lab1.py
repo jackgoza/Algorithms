@@ -94,25 +94,25 @@ def strassen_multiply_matrix(matrix1, matrix2):
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--test', default=False, required=False)
     arg_parser.add_argument('--input', default="inputs/LabStrassenInput.txt", required=False)
-    arg_parser.add_argument('--output', default="output/output.txt", required=False)
-    # todo: adjust output to accommodate this
-    arg_parser.add_argument('--show-resultants', default=False, required=False)
+    arg_parser.add_argument('--output', default="output.txt", required=False)
+    arg_parser.add_argument('--test', default=False, required=False, nargs='?', const=True)
+    arg_parser.add_argument('--clean', default=False, required=False, nargs='?', const=True)
+    arg_parser.add_argument('--resultants', default=False, required=False,  nargs='?', const=True)
     args = vars(arg_parser.parse_args())
 
     runnables = []
     input_file = args["input"]
     output_file = args["output"]
+    show_resultants = args["resultants"]
 
-    if args['test'] == "true":
+    if (args['clean'] or args['clean'] == "true") and os.path.exists(output_file):
+        os.remove(output_file)
+
+    if args['test'] or args['test'] == "true":
         runnables = parse_matrix_file("inputs/test_input.txt")
     else:
         runnables = parse_matrix_file(input_file)
-
-    # todo: remove this for TA safety?
-    # if os.path.exists(args[]):
-    #     os.remove('output/output.txt')
 
     for runnable in runnables:
         if runnable['error'] != '':
@@ -121,4 +121,4 @@ if __name__ == "__main__":
 
         ordinary_result = multiply_matrix(runnable['m1'], runnable['m2'])
         strassen_result = strassen_multiply_matrix(runnable['m1'], runnable['m2'])
-        output_success(output_file, ordinary_result, strassen_result, runnable)
+        output_success(show_resultants, output_file, ordinary_result, strassen_result, runnable)

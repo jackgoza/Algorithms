@@ -7,7 +7,7 @@
 # (it's really gross)
 
 def make_matrix(n):
-    with open("large_matrix.txt", 'w') as file:
+    with open("test_input_1024.txt", 'w') as file:
         file.write(f"{n}\n")
         for i in range(0, n):
             for j in range(0, n):

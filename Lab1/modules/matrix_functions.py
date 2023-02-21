@@ -36,7 +36,7 @@ def rebuild_rows(matrix1, matrix2):
     return [row1 + row2 for row1, row2 in zip(matrix1, matrix2)]
 
 
-# todo: cite https://stackoverflow.com/questions/18713321/element-wise-addition-of-2-lists
+# Full citation in report. https://stackoverflow.com/questions/18713321/element-wise-addition-of-2-lists
 def do_math(operand, matrix1, matrix2):
     """
     Applies the supplied math operator (add, sub) element by element across the two input matrices.
