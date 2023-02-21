@@ -66,9 +66,6 @@ def strassen_multiply_matrix(matrix1, matrix2):
     :param matrix2: single nested array
     :return: Tuple(int, single nested array)
     """
-    if not matrix1 or not matrix2:
-        raise Exception
-
     if len(matrix1) == 1:
         # return a 1 for counting, and the result
         # has to be double wrapped so that [i][j] access does not throw an error
@@ -98,22 +95,30 @@ def strassen_multiply_matrix(matrix1, matrix2):
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--test', default=False, required=False)
+    arg_parser.add_argument('--input', default="inputs/LabStrassenInput.txt", required=False)
+    arg_parser.add_argument('--output', default="output/output.txt", required=False)
+    # todo: adjust output to accommodate this
+    arg_parser.add_argument('--show-resultants', default=False, required=False)
     args = vars(arg_parser.parse_args())
 
     runnables = []
+    input_file = args["input"]
+    output_file = args["output"]
 
     if args['test'] == "true":
-        runnables = parse_matrix_file("input/test_input.txt")
+        runnables = parse_matrix_file("inputs/test_input.txt")
     else:
-        runnables = parse_matrix_file("input/LabStrassenInput.txt")
+        runnables = parse_matrix_file(input_file)
 
-    os.remove("output/output.txt")
+    # todo: remove this for TA safety?
+    # if os.path.exists(args[]):
+    #     os.remove('output/output.txt')
 
     for runnable in runnables:
         if runnable['error'] != '':
-            output_error("output/output.txt", runnable)
+            output_error(output_file, runnable)
             continue
 
         ordinary_result = multiply_matrix(runnable['m1'], runnable['m2'])
         strassen_result = strassen_multiply_matrix(runnable['m1'], runnable['m2'])
-        output_success("output/output.txt", ordinary_result, strassen_result, runnable)
+        output_success(output_file, ordinary_result, strassen_result, runnable)
