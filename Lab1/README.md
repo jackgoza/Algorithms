@@ -1,12 +1,12 @@
 John Goza
 
-
 Lab 1 - Strassen's algorithm
-
 
 No re-use or reproduction allowed. All rights retained by John Goza.
 
 Source and version history can be found at https://github.com/jackgoza/Algorithms
+
+Written using Pycharm
 
 # Running the program
 The program can be run by opening a terminal or command prompt window in the folder containing this code. It must be run
