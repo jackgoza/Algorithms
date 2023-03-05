@@ -10,6 +10,7 @@ p = pd.Series(p_i, index=range(1, n + 1))
 q = pd.Series(q_i)
 
 e = pd.DataFrame(np.diag(q), index=range(1, n + 2))
+print(e)
 w = pd.DataFrame(np.diag(q), index=range(1, n + 2))
 root = pd.DataFrame(np.zeros((n, n)), index=range(1, n + 1), columns=range(1, n + 1))
 

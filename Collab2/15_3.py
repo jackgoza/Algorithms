@@ -1,8 +1,10 @@
 import math
+import numpy as np
+import pandas as pd
 
 pointss = [[0, 0], [1, 6], [2, 3], [5, 2], [6, 5], [7, 1], [8, 4]]
-ppp = [1, 5, 147, 52, 16]
-dist = [[], [], [], [], [], []]
+dist = pd.DataFrame(np.zeros((7, 7)), index=range(0, 7), columns=range(0, 7))
+count = 0
 
 
 def sort(points):
@@ -10,26 +12,25 @@ def sort(points):
 
 
 def calc_distance(i, j, points):
-    if dist[i][j] != 0:
-        print(dist[i][j])
-        return dist[i][j]
+    global count
+    count = count + 1
+    if dist.at[i, j] != 0:
+        return dist.at[i, j]
 
-    dist[i][j] = min(calc_distance(i + 1, j, points) + math.dist(points[i], points[i + 1]),
-                     calc_distance(i + 1, i, points) + math.dist(points[j], points[i + 1]))
+    dist.at[i, j] = round(min(calc_distance(i + 1, j, points) + math.dist(points[i], points[i + 1]),
+                              calc_distance(i + 1, i, points) + math.dist(points[j], points[i + 1])), 2)
 
-    return dist[i][j]
+    print(f"i: {i}, j: {j}, dist: {dist.at[i, j]}")
+
+    return dist.at[i, j]
+
 
 points = sort(pointss)
-for i in range(6):
-    for j in range(6):
-        dist[i].append(0)
 
 for i in range(6):
-    dist[5][i] = math.dist(points[5], points[6]) + math.dist(points[i], points[6])
+    dist.at[5, i] = round(math.dist(points[5], points[6]) + math.dist(points[i], points[6]), 2)
 
-print(dist)
-dist1 = {'dist': math.dist(points[0], points[6]), 'prev': points[0]}
+count = 0
+print(points)
 print(calc_distance(0, 0, points))
-# dist2 = math.dist(points[0], points[2])
 print(dist)
-# print(dist2)
