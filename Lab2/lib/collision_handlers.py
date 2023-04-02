@@ -1,6 +1,8 @@
 # John Goza
 # Lab 2 - Hashing
 # No re-use or reproduction allowed. All rights retained by John Goza.
+from math import floor
+
 
 def check_and_store_item(table, key, value, bucket_size=1):
     if bucket_size == 1:
@@ -24,19 +26,25 @@ def check_and_store_item(table, key, value, bucket_size=1):
 def chain(key, value, table, stack):
     return -1, []
 
-def probe(key, value, table, mod, c1=0, c2=0):
+
+def probe(key, value, table, mod, bucket_size, c1=0, c2=0):
+    # todo: add bucket logic
     # Store the initial collision
     collisions = [key]
 
-    for i in range(len(table)):
+    for i in range(int(len(table) / bucket_size)):
         if c1 != 0 or c2 != 0:
-            new_key = int(value + (c1 * (i ** 2)) + (c2 * i)) % mod
+            new_key = int(floor((int(value + (c1 * (i ** 2)) + (c2 * i)) % mod) / bucket_size))
         else:
-            new_key = int(value + i) % mod
+            new_key = int(floor((int(value + i) % mod) / bucket_size))
         # If the space is open, take it
-        if table[new_key][1] == '-1':
-            table[new_key][1] = value
-            return new_key, collisions
+        for j in range(0, bucket_size):
+            try:
+                if table[new_key][j] == '-1':
+                    table[new_key][j] = value
+                    return new_key, collisions
+            except Exception as e:
+                return e
 
         # Else (implied due to return statement): if we hit another key, add that key to the list of collisions
         collisions.append(new_key)
@@ -44,8 +52,7 @@ def probe(key, value, table, mod, c1=0, c2=0):
     return -1, collisions
 
 
-def linear_probe(key, value, table):
-
+def old_linear_probe(key, value, table):
     # Store the first collision and increment the key
     collisions = [key]
     new_key = key + 1
@@ -68,14 +75,14 @@ def linear_probe(key, value, table):
     return -1, collisions
 
 
-def quadratic_probe(original_key, key, value, table, c1=0.5, c2=0.5, collisions=None):
+def old_quadratic_probe(original_key, key, value, table, c1=0.5, c2=0.5, collisions=None):
     collisions = [key]
     new_key = key + 1
     if key >= len(table):
         key = 0
     else:
         key += 1
-        
+
     if key == original_key:
         return -1, collisions
 
