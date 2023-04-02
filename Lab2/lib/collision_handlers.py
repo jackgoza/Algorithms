@@ -27,7 +27,7 @@ def chain(key, value, table, stack):
     return -1, []
 
 
-def probe(key, value, table, mod, bucket_size, c1=0, c2=0):
+def probe(key, value, table, mod=120, bucket_size=1, c1=0, c2=0):
     # todo: add bucket logic
     # Store the initial collision
     collisions = [key]

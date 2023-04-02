@@ -62,7 +62,7 @@
 #     },
 # ]
 
-from lib.hashes import hash_by_division
+from lib.hashes import hash_by_division, hash_by_multiplication
 from lib.output_handler import pretty_print_results
 
 
@@ -81,26 +81,12 @@ def init_table(bucket_size=1, table_size=120, chaining=False):
 
 programs = [
     {
-        'hash_function': 'division',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'chain',
-        'print_width': 3
-    },
-    {
-        'hash_function': 'division',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'linear',
-        'print_width': 5
-    },
-    {
-        'hash_function': 'division',
+        'hash_function': 'student',
         'modulo': 120,
         'buckets': 1,
         'collision_scheme': 'quadratic',
         'print_width': 5
-    },
+    }
 ]
 
 
@@ -269,7 +255,11 @@ for hashable in hashables:
         succeeded = []
 
         for value in hashable:
-            stats = hash_by_division(int(value), table, program['modulo'], program['collision_scheme'], program['buckets'])
+            if program['hash_function'] == 'student':
+                stats = hash_by_multiplication(value, table, program['collision_scheme'], program['buckets'])
+            else:
+                stats = hash_by_division(value, table, program['modulo'], program['collision_scheme'], program['buckets'])
+
             if stats[0] == -1:
                 print(f'Failed to store {value}')
                 failed.append(stats)
