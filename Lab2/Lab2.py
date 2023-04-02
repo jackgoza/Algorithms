@@ -1,30 +1,7 @@
 # John Goza
 # Lab 2 - Hashing
 # No re-use or reproduction allowed. All rights retained by John Goza.
-from modules.hashes import hash_by_division
-from modules.input_handler import parse_file
 
-def init_table(bucket_size=1, table_size=120):
-    if table_size % bucket_size != 0:
-        raise IndexError("Table size / bucket size has a remainder. Remainder should be 0")
-
-    table_slots = int(table_size / bucket_size)
-    return [[None, '-1']] * table_slots
-    # return [[None, ['-1'] * bucket_size]] * table_slots
-
-
-def init_stack(table_size=120):
-    return list(range(table_size))
-
-programs = [
-    {
-        'hash_function': 'division',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'linear',
-        'print_width': 5
-    },
-]
 
 # programs = [
 #     {
@@ -85,20 +62,193 @@ programs = [
 #     },
 # ]
 
-test_hashable = [
-    '12501',
-    '84763',
-    '22599',
-    '02698',
-    '55555',
-    '72501',
-    '99999',
-    '33975',
-    '62501',
-    '42501'
+from lib.hashes import hash_by_division
+from lib.output_handler import pretty_print_results
+
+
+def init_table(bucket_size=1, table_size=120):
+    if table_size % bucket_size != 0:
+        raise IndexError("Table size / bucket size has a remainder. Remainder should be 0")
+
+    table_slots = int(table_size / bucket_size)
+
+    # https://stackoverflow.com/questions/3459098/create-list-of-single-item-repeated-n-times
+    return [[None, '-1'] for _ in range(0, table_slots)]
+    # return [[None, ['-1'] * bucket_size]] * table_slots
+
+
+def init_stack(table_size=120):
+    return list(range(table_size))
+
+programs = [
+    {
+        'hash_function': 'division',
+        'modulo': 120,
+        'buckets': 1,
+        'collision_scheme': 'linear',
+        'print_width': 5
+    },
 ]
 
-hashables = parse_file("inputs/LabHashingInput.txt")
+
+test_hashable = [
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+    '13956',
+]
+
+# hashables = parse_file("inputs/LabHashingInput.txt")
+hashables = [test_hashable]
 for hashable in hashables:
     for program in programs:
         table = init_table(program['buckets'], 120)
@@ -106,9 +256,12 @@ for hashable in hashables:
         if program['collision_scheme'] == 'chain':
             stack = init_stack()
 
-            for value in hashable:
-                stats = hash_by_division(value, table, program['modulo'], program['collision_scheme'])
-                print(stats)
+        for value in hashable:
+            print(value)
+            stats = hash_by_division(value, table, program['modulo'], program['collision_scheme'])
+            print(stats)
+
+        pretty_print_results(table)
 
 # for i in test_input:
 # 	val = hash_by_division(i, init_table)

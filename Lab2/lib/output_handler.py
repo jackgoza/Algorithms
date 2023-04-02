@@ -6,10 +6,10 @@ from os import path
 
 
 def get_printable(key, table):
-    if table[key] == '-1':
+    if table[key][1] == '-1':
         return 'XXXXX'
     else:
-        return table[key]
+        return table[key][1]
 
 
 def pretty_print_results(table):

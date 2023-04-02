@@ -2,7 +2,7 @@
 # Lab 2 - Hashing
 # No re-use or reproduction allowed. All rights retained by John Goza.
 
-from collision_handlers import chain, linear_probe, quadratic_probe
+from lib.collision_handlers import chain, probe
 
 
 def hash_by_division(value, table, mod_divisor=120, collision_scheme='linear', bucket_size=1):
@@ -12,15 +12,16 @@ def hash_by_division(value, table, mod_divisor=120, collision_scheme='linear', b
         print("Error converting " + value + " to integer. Discarding then continuing to next value.")
         return
 
-    if table[key] == '-1':
-        table[key] = value
+    if table[key][1] == '-1':
+        table[key][1] = value
         return key, []
 
     if collision_scheme == 'linear':
-        return linear_probe(key, value, table)
+        return probe(key, int(value), table, mod_divisor)
 
     if collision_scheme == 'quadratic':
-        return quadratic_probe(key, value, table, mod_divisor)
+        return probe(key, int(value), table, mod_divisor, 0.5, 0.5)
 
     if collision_scheme == 'chain':
+        print('chain')
         return chain(key, value, table)
