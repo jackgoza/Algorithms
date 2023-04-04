@@ -7,7 +7,7 @@ from os import path
 
 def get_printable(key, table):
     if table[key][0] == '-1':
-        return 'XXXXXXX'
+        return ' XXXXXXX '
     else:
         return str(table[key])
 

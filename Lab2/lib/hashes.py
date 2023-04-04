@@ -31,17 +31,17 @@ def hash_by_multiplication(value, table, collision_scheme='linear', bucket_size=
 
     for i in range(0, bucket_size):
         if table[key][i] == '-1':
-            table[key][i] = int_value
+            table[key][i] = value
             return key, []
 
     if collision_scheme == 'linear':
-        return probe(key, int_value, table)
+        return probe(key, value, table)
 
     if collision_scheme == 'quadratic':
-        return probe(key, int_value, table, 120, 1, 0.5, 0.5)
+        return probe(key, value, table, 120, 1, 0.5, 0.5)
 
     if collision_scheme == 'chain':
-        table[key] += [int_value]
+        table[key] += [value]
         return key, []
 
 
