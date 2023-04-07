@@ -3,7 +3,7 @@
 # No re-use or reproduction allowed. All rights retained by John Goza.
 from math import floor, log
 
-from lib.collision_handlers import probe_for_multiplication, probe_for_division
+from lib.collision_handlers import probe
 
 # CONSTANTS:
 # from p264 of Cormen
@@ -44,10 +44,10 @@ def hash_by_multiplication(value, table, collision_scheme='linear', bucket_size=
             return format_result(key, value, [], 1)
 
     if collision_scheme == 'linear':
-        return format_result(*probe_for_multiplication(key, value, table))
+        return format_result(*probe(key, value, table))
 
     if collision_scheme == 'quadratic':
-        return format_result(*probe_for_multiplication(key, value, table, 120, 1, 0.5, 0.5))
+        return format_result(*probe(key, value, table, 120, 1, 0.5, 0.5))
 
     if collision_scheme == 'chain':
         table[key] += [value]
@@ -66,14 +66,14 @@ def hash_by_division(value, table, mod_divisor=120, collision_scheme='linear', b
 
     for i in range(0, bucket_size):
         if table[key][i] == '-1':
-            table[key][i] = int_value
+            table[key][i] = value
             return format_result(key, value, [], 1)
 
     if collision_scheme == 'linear':
-        return format_result(*probe_for_division(key, int_value, table, mod_divisor, bucket_size))
+        return format_result(*probe(key, value, table, mod_divisor, bucket_size))
 
     if collision_scheme == 'quadratic':
-        return format_result(*probe_for_division(key, int_value, table, mod_divisor, bucket_size, 0.5, 0.5))
+        return format_result(*probe(key, value, table, mod_divisor, bucket_size, 0.5, 0.5))
 
     if collision_scheme == 'chain':
         table[key] += [int_value]

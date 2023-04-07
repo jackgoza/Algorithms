@@ -242,6 +242,41 @@ programs = [
         'buckets': 1,
         'collision_scheme': 'linear',
         'print_width': 5
+    },
+    {
+        'hash_function': 'student',
+        'modulo': 120,
+        'buckets': 1,
+        'collision_scheme': 'quadratic',
+        'print_width': 5
+    },
+    {
+        'hash_function': 'student',
+        'modulo': 120,
+        'buckets': 1,
+        'collision_scheme': 'chain',
+        'print_width': 5
+    },
+    {
+        'hash_function': 'division',
+        'modulo': 120,
+        'buckets': 1,
+        'collision_scheme': 'linear',
+        'print_width': 5
+    },
+    {
+        'hash_function': 'division',
+        'modulo': 120,
+        'buckets': 1,
+        'collision_scheme': 'quadratic',
+        'print_width': 5
+    },
+    {
+        'hash_function': 'division',
+        'modulo': 120,
+        'buckets': 1,
+        'collision_scheme': 'chain',
+        'print_width': 5
     }
 ]
 
