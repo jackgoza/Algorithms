@@ -12,7 +12,7 @@ def get_printable(key, table):
         return str(table[key])
 
 
-def pretty_print_results(table, program, succeeded, failed):
+def pretty_print_results(table, program, stats, succeeded, failed):
     print_width = program['print_width']
     print(f"Method: {program['hash_function']}, mod: {program['modulo']}")
     print(f"Bucket size: {program['buckets']}")

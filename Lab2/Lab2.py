@@ -240,19 +240,20 @@ programs = [
         'hash_function': 'student',
         'modulo': 120,
         'buckets': 1,
-        'collision_scheme': 'quadratic',
+        'collision_scheme': 'linear',
         'print_width': 5
     }
 ]
 
 
 hashables = parse_file("inputs/LabHashingInput.txt")
-# hashables = [test_hashable]
+
 for hashable in hashables:
     for program in programs:
         table = init_table(program['buckets'], 120, program['collision_scheme'] == 'chain')
         failed = []
         succeeded = []
+        agg_stats = []
 
         for value in hashable:
             if program['hash_function'] == 'student':
@@ -260,16 +261,12 @@ for hashable in hashables:
             else:
                 stats = hash_by_division(value, table, program['modulo'], program['collision_scheme'], program['buckets'])
 
-            if stats[0] == -1:
+            agg_stats.append(stats)
+
+            if stats['key'] == -1:
                 print(f'Failed to store {value}')
                 failed.append(stats)
             else:
                 succeeded.append(value)
 
-        pretty_print_results(table, program, succeeded, failed)
-
-# for i in test_input:
-# 	val = hash_by_division(i, init_table)
-# 	print(f"{i}, {val}")
-#
-# pretty_print_results(init_table)
+        pretty_print_results(table, program, agg_stats, succeeded, failed)

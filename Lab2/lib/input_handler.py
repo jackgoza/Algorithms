@@ -45,9 +45,4 @@ def parse_file(filename):
 
 
 def ingest_file(filename):
-    hashables = parse_file(filename)
-    print(hashables)
-
-
-# todo: implement file ingestion using functions defined above
-ingest_file("inputs/LabHashingInput.txt")
+    return parse_file(filename)

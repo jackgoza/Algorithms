@@ -4,33 +4,49 @@
 from math import floor
 
 
-def check_and_store_item(table, key, value, bucket_size=1):
-    if bucket_size == 1:
-        if table[key] == '-1':
-            table[key] = value
-
-        # If the bucket is size 1 and the value is not '-1', the bucket is full.
-        return False
-
-    if bucket_size > 1:
-        if table[key] == '-1':
-            # If the bucket is size > 1 and init value ('-1'), make the array for the bucket.
-            table[key] = [value]
-
-        # If the bucket is size > 1 and the array is already there and
-        # len(array) < bucket_size, add the newest value to the bucket.
-        elif len(table[key]) < bucket_size:
-            table[key] += value
-
-
-def chain(key, value, table, stack):
-    return -1, []
-
-
-def probe(key, value, table, mod=120, bucket_size=1, c1=0, c2=0):
+def probe_for_division(key, value, table, mod=120, bucket_size=1, c1=0, c2=0):
     # todo: add bucket logic
     # Store the initial collision
     collisions = [key]
+    # we have already made one comparison which is how we ended up here
+    comparisons = 1
+
+    # This has already been checked so no need to handle type error here
+    int_value = int(value)
+
+    for i in range(int(len(table) / bucket_size)):
+
+        # CASE: quadratic probing
+        if c1 != 0 or c2 != 0:
+            new_key = int(floor((int(int_value + (c1 * (i ** 2)) + (c2 * i)) % mod) / bucket_size))
+
+        # CASE: linear probing
+        else:
+            new_key = int(floor((int(int_value + i) % mod) / bucket_size))
+
+        # If: the space is open, take it
+        for j in range(0, bucket_size):
+            try:
+                # we are about to make a comparison
+                comparisons += 1
+                if table[new_key][j] == '-1':
+                    table[new_key][j] = value
+                    return new_key, value, collisions, comparisons
+            except Exception as e:
+                return e
+
+        # Else: (implied due to return statement): if we hit another key, add that key to the list of collisions
+        collisions.append(new_key)
+
+    return -1, value, collisions, comparisons
+
+
+def probe_for_multiplication(key, value, table, mod=120, bucket_size=1, c1=0, c2=0):
+    # todo: add bucket logic
+    # Store the initial collision
+    collisions = [key]
+    # we have already made one comparison which is how we ended up here
+    comparisons = 1
 
     # This has already been checked so no need to handle type error here
     int_value = int(value)
@@ -43,56 +59,15 @@ def probe(key, value, table, mod=120, bucket_size=1, c1=0, c2=0):
         # If the space is open, take it
         for j in range(0, bucket_size):
             try:
+                # we are about to make a comparison
+                comparisons += 1
                 if table[new_key][j] == '-1':
                     table[new_key][j] = value
-                    return new_key, collisions
+                    return new_key, value, collisions, comparisons
             except Exception as e:
                 return e
 
         # Else (implied due to return statement): if we hit another key, add that key to the list of collisions
         collisions.append(new_key)
 
-    return -1, collisions
-
-
-def old_linear_probe(key, value, table):
-    # Store the first collision and increment the key
-    collisions = [key]
-    new_key = key + 1
-
-    # Stop condition is when new_key = key, i.e. when we have visited every table slot
-    while new_key != key:
-        # If the space is open, take it
-        if table[new_key][1] == '-1':
-            table[new_key][1] = value
-            return new_key, collisions
-
-        # If we hit another key, add that key to the list of collisions
-        collisions.append(new_key)
-
-        if new_key >= len(table):
-            new_key = 0
-        else:
-            new_key += 1
-
-    return -1, collisions
-
-
-def old_quadratic_probe(original_key, key, value, table, c1=0.5, c2=0.5, collisions=None):
-    collisions = [key]
-    new_key = key + 1
-    if key >= len(table):
-        key = 0
-    else:
-        key += 1
-
-    if key == original_key:
-        return -1, collisions
-
-    quad_probe = int(c1 * (key ** 2) + c2 * key)
-
-    if table[key][1] == '-1':
-        table[key][1] = value
-        return key, collisions
-    else:
-        return quadratic_probe(original_key, key, value, table, c1, c2, collisions + [key])
+    return -1, value, collisions, comparisons
