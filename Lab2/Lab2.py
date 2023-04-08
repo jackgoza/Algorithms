@@ -2,306 +2,103 @@
 # Lab 2 - Hashing
 # No re-use or reproduction allowed. All rights retained by John Goza.
 
-# test_hashable = [
-#     '13955',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '12222',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '14544',
-#     '13956',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13957',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13956',
-#     '13957',
-# ]
+"""
+TYPE DEFS:
 
-# programs = [
-#     {
-#         'hash_function': 'division',
-#         'modulo': 120,
-#         'buckets': 1,
-#         'collision_scheme': 'linear',
-#         'print_width': 5
-#     },
-#     {
-#         'hash_function': 'division',
-#         'modulo': 120,
-#         'buckets': 1,
-#         'collision_scheme': 'quadratic',
-#         'print_width': 5
-#     },
-#     {
-#         'hash_function': 'division',
-#         'modulo': 120,
-#         'buckets': 1,
-#         'collision_scheme': 'chain',
-#         'print_width': 5
-#     },
-#     {
-#         'hash_function': 'division',
-#         'modulo': 113,
-#         'buckets': 1,
-#         'collision_scheme': 'linear',
-#         'print_width': 5
-#     },
-#     {
-#         'hash_function': 'division',
-#         'modulo': 113,
-#         'buckets': 1,
-#         'collision_scheme': 'quadratic',
-#         'print_width': 5
-#     },
-#     {
-#         'hash_function': 'division',
-#         'modulo': 113,
-#         'buckets': 1,
-#         'collision_scheme': 'chain',
-#         'print_width': 5
-#     },
-#     {
-#         'hash_function': 'division',
-#         'modulo': 41,
-#         'buckets': 3,
-#         'collision_scheme': 'linear',
-#         'print_width': 3
-#     },
-#     {
-#         'hash_function': 'division',
-#         'modulo': 41,
-#         'buckets': 3,
-#         'collision_scheme': 'quadratic',
-#         'print_width': 3
-#     },
-# ]
+config:
+    {
+        'hash_function': String('division'|'student'),
+        'modulo': Integer,
+        'buckets': Integer,
+        'collision_scheme': String('linear'|'quadratic'|'chain'),
+        'print_width': Integer,
+        'c1': Optional Float,
+        'c2': Optional Float
+    }
 
-from lib.hashes import hash_by_division, hash_by_multiplication
+formatted_result:
+    {
+        'key': Integer,
+        'value': String,
+        'collisions': Array[Integer],
+        'comparisons': Integer
+    }
+
+hash_table:
+        Array[ Array[ String ] ]
+
+        Strings are defaulted to '-1'
+"""
+
+import argparse
+
+from config import standard_configs, test_configs
+from lib.hasher import hash_values
 from lib.input_handler import parse_file
-from lib.output_handler import pretty_print_results
+from lib.output_handler import pretty_print_results, write_line, write_report_line, delete_old_report_file
 
 
-def init_table(bucket_size=1, table_size=120, chaining=False):
+def init_table(program):
+    """
+    Initializes a hash_table array for the given config's bucket size and collision scheme.
+
+    If buckets == 1, hash_table will be [['-1'], ['-1'], ..., ['-1']]
+
+    If buckets == 2, hash_table will be [['-1', '-1'], ['-1', '-1'], ..., ['-1', '-1']]
+
+    Pattern persists as buckets increases
+    :param program: config
+    :return: hash_table
+    """
+    bucket_size = program['buckets']
+    table_size = 120
+
     if table_size % bucket_size != 0:
         raise IndexError("Table size / bucket size has a remainder. Remainder should be 0")
 
     table_slots = int(table_size / bucket_size)
 
-    if chaining:
+    if program['collision_scheme'] == 'chain':
         return [['-1'] for _ in range(0, table_slots)]
     else:
         # https://stackoverflow.com/questions/3459098/create-list-of-single-item-repeated-n-times
         return [['-1' for _ in range(0, bucket_size)] for _ in range(0, table_slots)]
 
 
-programs = [
-    {
-        'hash_function': 'student',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'linear',
-        'print_width': 5
-    },
-    {
-        'hash_function': 'student',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'quadratic',
-        'print_width': 5
-    },
-    {
-        'hash_function': 'student',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'chain',
-        'print_width': 5
-    },
-    {
-        'hash_function': 'division',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'linear',
-        'print_width': 5
-    },
-    {
-        'hash_function': 'division',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'quadratic',
-        'print_width': 5
-    },
-    {
-        'hash_function': 'division',
-        'modulo': 120,
-        'buckets': 1,
-        'collision_scheme': 'chain',
-        'print_width': 5
-    }
-]
+if __name__ == "__main__":
+    arg_parser = argparse.ArgumentParser()
+    arg_parser.add_argument('--input', default="inputs/LabHashingInput.txt", required=False)
+    arg_parser.add_argument('--output', default="outputs/output.txt", required=False)
+    arg_parser.add_argument('--report', default=False, required=False, nargs='?', const=True)
+    arg_parser.add_argument('--test', default=False, required=False, nargs='?', const=True)
+    args = vars(arg_parser.parse_args())
 
+    input_file = args["input"]
+    output_file = args["output"]
+    make_report = args['report'] or args['report'] == "true"
 
-hashables = parse_file("inputs/LabHashingInput.txt")
+    if make_report:
+        delete_old_report_file(output_file)
+        header = " ".join([
+            "Hashing Function, Modulo, Bucket Size, Bucket Count, Collision Handling, Comparisons,",
+            "Primary Collisions, Secondary Collisions, Failed Inserts, Load Factor"
+        ])
+        write_line(output_file, header)
 
-for hashable in hashables:
-    for program in programs:
-        table = init_table(program['buckets'], 120, program['collision_scheme'] == 'chain')
-        failed = []
-        succeeded = []
-        agg_stats = []
+    if args['test'] or args['test'] == "true":
+        hashables = parse_file("inputs/TestHashingInput.txt")
+        programs = test_configs
+    else:
+        hashables = parse_file(input_file)
+        configs = standard_configs
 
-        for value in hashable:
-            if program['hash_function'] == 'student':
-                stats = hash_by_multiplication(value, table, program['collision_scheme'], program['buckets'])
-            else:
-                stats = hash_by_division(value, table, program['modulo'], program['collision_scheme'], program['buckets'])
+    for hashable in hashables:
+        for config in configs:
+            table = init_table(config)
 
-            agg_stats.append(stats)
+            agg_stats, failed, succeeded = hash_values(config, hashable, table)
 
-            if stats['key'] == -1:
-                print(f'Failed to store {value}')
-                failed.append(stats)
-            else:
-                succeeded.append(value)
+            if make_report:
+                write_report_line(output_file, config, agg_stats, succeeded, failed)
 
-        pretty_print_results(table, program, agg_stats, succeeded, failed)
+            pretty_print_results(table, config, agg_stats, succeeded, failed)

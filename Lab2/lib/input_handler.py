@@ -6,16 +6,36 @@ from os import path
 
 
 def check_and_open_file(filename):
+    """
+    Opens file for reading if it exists, is not a directory, and is readable
+    :param filename: String
+    :return: FileStream
+    :throws IOError if specified file does not exist, is a directory, or is not readable
+    """
     if not path.exists(filename):
-        raise IOError("Provided filename does not exist")
+        raise IOError("Provided filename does not exist.")
 
     if not path.isfile(filename):
-        raise IOError("Provided filename points to a directory")
+        raise IOError("Provided filename points to a directory.")
 
-    return open(filename, "r")
+    opened = open(filename, "r")
+
+    if not opened.readable():
+        opened.close()
+        raise IOError("File is read-locked. Are your permissions correct?")
+
+    return opened
 
 
 def parse_file(filename):
+    """
+    Reads input from provided filename. Validates that file exists and that file contains at least one block of
+    hashable values. Blocks must be one integer value per line and may not have extra whitespace between lines.
+    Extra whitespace is interpreted as "end of block". Lines with non-digit characters are ignored.
+    :param filename: String
+    :return: Array[ Array[ String ] ]
+    :throws IOException if file does not exist or is invalid, or if it contains no valid blocks
+    """
     # check_and_open_file can raise an IOError
     file = check_and_open_file(filename)
 

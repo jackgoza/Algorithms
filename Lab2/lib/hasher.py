@@ -1,6 +1,12 @@
 # John Goza
 # Lab 2 - Hashing
 # No re-use or reproduction allowed. All rights retained by John Goza.
+
+"""
+TYPE DEFS:
+    Reference Lab2.py for information on parameter / object structures
+"""
+
 from math import floor, log
 
 from lib.collision_handlers import probe
@@ -12,6 +18,14 @@ log_of_2 = log(2)
 
 
 def format_result(key, value, collisions, comparisons):
+    """
+
+    :param key: Integer
+    :param value: String
+    :param collisions: Array[Integer]
+    :param comparisons: Integer
+    :return: formatted_result
+    """
     return {
         'key': key,
         'value': value,
@@ -19,7 +33,40 @@ def format_result(key, value, collisions, comparisons):
         'comparisons': comparisons
     }
 
+
+def hash_values(config, hashable, table):
+    agg_stats = []
+    failed = []
+    succeeded = []
+
+    for value in hashable:
+        if config['hash_function'] == 'student':
+            stats = hash_by_multiplication(value, table, config['collision_scheme'], config['buckets'])
+        else:
+            stats = hash_by_division(value, table, config['modulo'], config['collision_scheme'],
+                                     config['buckets'])
+
+        agg_stats.append(stats)
+
+        if stats['key'] == -1:
+            print(f'Failed to store {value}')
+            failed.append(stats)
+        else:
+            succeeded.append(value)
+
+    return agg_stats, failed, succeeded
+
+
 def hash_by_multiplication(value, table, collision_scheme='linear', bucket_size=1):
+    """
+
+    :param value: String
+    :param table:
+    :param collision_scheme:
+    :param bucket_size:
+    :return:
+    """
+
     try:
         # check for type consistency before we do any other math as math is expensive and cast to int is not
         int_value = int(value)
