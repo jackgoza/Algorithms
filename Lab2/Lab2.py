@@ -35,7 +35,7 @@ import argparse
 from config import standard_configs, test_configs
 from lib.hasher import hash_values
 from lib.input_handler import parse_file
-from lib.output_handler import pretty_print_results, write_line, write_report_line, delete_old_report_file
+from lib.output_handler import pretty_print_results, write_line, write_report_line, delete_old_file
 
 
 def init_table(program):
@@ -67,25 +67,33 @@ def init_table(program):
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--input', default="inputs/LabHashingInput.txt", required=False)
-    arg_parser.add_argument('--output', default="outputs/output.txt", required=False)
+    arg_parser.add_argument('--input-file', default="inputs/LabHashingInput.txt", required=False)
+    arg_parser.add_argument('--console', default=False, required=False, nargs='?', const=True)
+    arg_parser.add_argument('--output-file', default="outputs/output.txt", required=False)
     arg_parser.add_argument('--report', default=False, required=False, nargs='?', const=True)
+    arg_parser.add_argument('--report-file', default="outputs/report.csv", required=False)
     arg_parser.add_argument('--test', default=False, required=False, nargs='?', const=True)
     args = vars(arg_parser.parse_args())
 
     input_file = args["input"]
-    output_file = args["output"]
+    output_to_console = args['console'] or args['console'] == "true"
+    output_file = args["output_file"]
     make_report = args['report'] or args['report'] == "true"
+    report_file = args["report_file"]
+    run_tests = args['test'] or args['test'] == "true"
 
     if make_report:
-        delete_old_report_file(output_file)
+        delete_old_file(report_file)
         header = " ".join([
             "Hashing Function, Modulo, Bucket Size, Bucket Count, Collision Handling, Comparisons,",
             "Primary Collisions, Secondary Collisions, Failed Inserts, Load Factor"
         ])
-        write_line(output_file, header)
+        write_line(report_file, header)
 
-    if args['test'] or args['test'] == "true":
+    if not output_to_console:
+        delete_old_file(output_file)
+
+    if run_tests:
         hashables = parse_file("inputs/TestHashingInput.txt")
         programs = test_configs
     else:
@@ -99,6 +107,6 @@ if __name__ == "__main__":
             agg_stats, failed, succeeded = hash_values(config, hashable, table)
 
             if make_report:
-                write_report_line(output_file, config, agg_stats, succeeded, failed)
+                write_report_line(report_file, config, agg_stats, succeeded, failed)
 
-            pretty_print_results(table, config, agg_stats, succeeded, failed)
+            pretty_print_results(table, config, agg_stats, succeeded, failed, output_to_console, output_file)

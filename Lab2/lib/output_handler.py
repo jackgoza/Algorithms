@@ -20,14 +20,14 @@ def aggregate_stats(list_of_stats):
             'secondary_collisions': secondary_collisions}
 
 
-def delete_old_report_file(filename):
+def delete_old_file(filename):
     if os.path.exists(filename):
         try:
             os.remove(filename)
         except IOError as ioe:
-            print('Unable to delete old report file; see error below.')
-            print('Old report file may be appended to as program continues. It is recommended that you')
-            print('delete the file after program is done.')
+            print('Unable to delete old file; see error below.')
+            print('Old file may be appended to as program continues. It is recommended that you')
+            print('manually delete the file after program is done.')
             print(ioe)
 
 
@@ -53,41 +53,53 @@ def write_report_line(filename, program, stats, succeeded, failed):
     write_line(filename, line)
 
 
-def get_printable(key, table, bucket_size):
-    if table[key][0] == '-1':
-        return ' XXXXXXX ' if bucket_size == 1 else ' ------- '
+def get_printable(i, j, table, bucket_size, is_chained):
+    if bucket_size > 1:
+        x = i
+        y = j
     else:
-        return str(table[key])
+        x = i + j
+        y = 0
+
+    if is_chained and len(table[x]) > 1:
+        return f'{len(table[x])} items'
+    elif table[x][y] == '-1':
+        return ' ----- '
+    else:
+        return ' ' + table[x][y] + ' '
 
 
-def pretty_print_results(table, program, stats, succeeded, failed):
+def pretty_print_results(table, program, stats, succeeded, failed, output_to_console, output_file):
     agg_stats = aggregate_stats(stats)
     print_width = program['print_width']
     bucket_size = program['buckets']
-    print(f"Method: {program['hash_function']}, Mod: {program['modulo']}")
-    print(f"Bucket size: {bucket_size}, Bucket count: {int(120 / int(program['buckets']))}")
-    print(f"Collision handling: {program['collision_scheme']}")
-    print(f"Number of comparisons: {agg_stats['comparisons']}")
-    print(
-        f"Number of collisions - Primary: {agg_stats['primary_collisions']}, Secondary: {agg_stats['secondary_collisions']}")
-    print(f"Number of items not inserted: {len(failed)}")
-    print(f"Load factor: {round(len(succeeded) / 120, 2)}")
+    is_chained = program['collision_scheme'] == 'chain'
+    output_lines = [
+        f"Method: {program['hash_function']}, Mod: {program['modulo']}",
+        f"Bucket size: {bucket_size}, Bucket count: {int(120 / int(program['buckets']))}",
+        f"Collision handling: {program['collision_scheme']}",
+        f"Number of comparisons: {agg_stats['comparisons']}",
+        f"Number of collisions - Primary: {agg_stats['primary_collisions']}, Secondary: {agg_stats['secondary_collisions']}",
+        f"Number of items not inserted: {len(failed)}",
+        f"Load factor: {round(len(succeeded) / 120, 2)}",
+    ]
 
-    table_len = len(table)
+    i_increment = 1 if bucket_size > 1 else print_width
+    j_max = bucket_size if bucket_size > 1 else print_width
 
-    for i in range(0, len(table), print_width):
+    for i in range(0, len(table), i_increment):
         printables = []
-        for j in range(0, print_width):
+        for j in range(0, j_max):
+            printables.append(get_printable(i, j, table, bucket_size, is_chained))
 
-            # Catch those situations where (120 / buckets) % print_width != 0
-            if i + j >= table_len:
-                continue
-            try:
-                printables.append(get_printable(i + j, table, bucket_size))
-            except IndexError as e:
-                print("OH NO")
-                continue
+        if bucket_size > 1:
+            output_lines.append(f"{i + 1: <3}{':': <6}{' '.join(printables)}")
+        else:
+            output_lines.append(f"{i + 1: <3}-{i + print_width:>3}{':': <6}{' '.join(printables)}")
 
-        print(f"Bucket {i + 1: <3}-{i + print_width:>3}{':': <6}{' '.join(printables)}")
-
-    print('')
+    if output_to_console:
+        [print(line) for line in output_lines]
+        print('\n')
+    else:
+        [write_line(output_file, line) for line in output_lines]
+        write_line(output_file, '\n')
