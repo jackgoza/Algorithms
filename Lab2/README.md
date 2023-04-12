@@ -20,6 +20,10 @@ python Lab2.py
     location.
     
 Additional flags:
+    --console
+                Logs output to the console rather than to an
+                output file.
+
     --input-file 'path/to/file.txt'
                 Ingests the file at location passed to flag.
                 Locations should be relative to content root
@@ -37,11 +41,13 @@ Additional flags:
                 Writes the metadata from the results into a 
                 csv for ease of import into csv editor. Csv
                 is saved under 'outputs/report.csv' by default.
+                
     --report-file
                 Outputs the report file at location passed to 
                 flag. Locations should be relative to content 
                 root (e.g. 'outputs/report.csv).
                 Default: 'outputs/report.csv'
+                
     --test
                 Runs all user-defined test cases in the file
                 "inputs/TestHashingInput.txt". Test flag 
