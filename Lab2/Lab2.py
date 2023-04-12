@@ -75,7 +75,7 @@ if __name__ == "__main__":
     arg_parser.add_argument('--test', default=False, required=False, nargs='?', const=True)
     args = vars(arg_parser.parse_args())
 
-    input_file = args["input"]
+    input_file = args["input_file"]
     output_to_console = args['console'] or args['console'] == "true"
     output_file = args["output_file"]
     make_report = args['report'] or args['report'] == "true"
@@ -94,8 +94,11 @@ if __name__ == "__main__":
         delete_old_file(output_file)
 
     if run_tests:
-        hashables = parse_file("inputs/TestHashingInput.txt")
-        programs = test_configs
+        if input_file == "inputs/LabHashingInput.txt":
+            raise Exception("--input-file must be set if using the --test flag!")
+        else:
+            hashables = parse_file(input_file)
+            programs = test_configs
     else:
         hashables = parse_file(input_file)
         configs = standard_configs

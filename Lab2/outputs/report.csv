@@ -1,0 +1,12 @@
+Hashing Function, Modulo, Bucket Size, Bucket Count, Collision Handling, Comparisons, Primary Collisions, Secondary Collisions, Failed Inserts, Load Factor
+division, 120, 1, 120, linear, 4199, 111, 3968, 20, 1.0
+division, 120, 1, 120, quadratic, 3473, 115, 3238, 20, 1.0
+division, 120, 1, 120, chain, 140, 0, 0, 0, 1.17
+division, 113, 1, 120, linear, 3790, 107, 3563, 20, 1.0
+division, 113, 1, 120, quadratic, 3152, 111, 2921, 20, 1.0
+division, 113, 1, 120, chain, 140, 0, 0, 0, 1.17
+division, 41, 3, 40, linear, 4112, 104, 1268, 20, 1.0
+division, 41, 3, 40, quadratic, 3695, 104, 1129, 20, 1.0
+student, 120, 1, 120, linear, 4060, 133, 3807, 20, 1.0
+student, 120, 1, 120, quadratic, 3330, 133, 3077, 20, 1.0
+student, 120, 1, 120, chain, 140, 0, 0, 0, 1.17

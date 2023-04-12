@@ -19,7 +19,6 @@ log_of_2 = log(2)
 
 def format_result(key, value, collisions, comparisons):
     """
-
     :param key: Integer
     :param value: String
     :param collisions: Array[Integer]
@@ -35,6 +34,14 @@ def format_result(key, value, collisions, comparisons):
 
 
 def hash_values(config, hashable, table):
+    """
+    Takes a list of hashables and applies the correct hashing function to them with the correct config.
+
+    :param config: config,
+    :param hashable: Array[ String ],
+    :param table: hash_table,
+    :return: Array[ formatted_result ], Array[ String ], Array[ String ]
+    """
     agg_stats = []
     failed = []
     succeeded = []
@@ -59,12 +66,11 @@ def hash_values(config, hashable, table):
 
 def hash_by_multiplication(value, table, collision_scheme='linear', bucket_size=1):
     """
-
     :param value: String
-    :param table:
-    :param collision_scheme:
-    :param bucket_size:
-    :return:
+    :param table: hash_table
+    :param collision_scheme: String('linear'|'quadratic'|'chain')
+    :param bucket_size: Integer
+    :return: formatted_result
     """
 
     try:
@@ -94,7 +100,7 @@ def hash_by_multiplication(value, table, collision_scheme='linear', bucket_size=
         return format_result(*probe(key, value, table))
 
     if collision_scheme == 'quadratic':
-        return format_result(*probe(key, value, table, 120, 1, 0.5, 0.5))
+        return format_result(*probe(key, value, table, 1, 0.5, 0.5))
 
     if collision_scheme == 'chain':
         table[key] += [value]
@@ -103,6 +109,14 @@ def hash_by_multiplication(value, table, collision_scheme='linear', bucket_size=
 
 
 def hash_by_division(value, table, mod_divisor=120, collision_scheme='linear', bucket_size=1):
+    """
+    :param value: String
+    :param table: hash_table
+    :param mod_divisor: Integer
+    :param collision_scheme: String('linear'|'quadratic'|'chain')
+    :param bucket_size: Integer
+    :return: formatted_result
+    """
     try:
         int_value = int(value)
     except ValueError:
@@ -117,10 +131,10 @@ def hash_by_division(value, table, mod_divisor=120, collision_scheme='linear', b
             return format_result(key, value, [], 1)
 
     if collision_scheme == 'linear':
-        return format_result(*probe(key, value, table, mod_divisor, bucket_size))
+        return format_result(*probe(key, value, table, bucket_size))
 
     if collision_scheme == 'quadratic':
-        return format_result(*probe(key, value, table, mod_divisor, bucket_size, 0.5, 0.5))
+        return format_result(*probe(key, value, table, bucket_size, 0.5, 0.5))
 
     if collision_scheme == 'chain':
         table[key] += [int_value]

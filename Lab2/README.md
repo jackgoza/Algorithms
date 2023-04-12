@@ -24,23 +24,26 @@ Additional flags:
                 Ingests the file at location passed to flag.
                 Locations should be relative to content root
                 (e.g. 'inputs/test_input.txt).
-                Default: 'input/LabHashingInput.txt'
+                Default: 'inputs/LabHashingInput.txt'
 
     --output-file 'path/to/file.txt'
                 Writes to the file at location passed to flag.
                 Locations should be relative to content root
                 and any specified sub-directories must exists
-                (e.g. 'output/test_output.txt')
+                (e.g. 'outputs/test_output.txt')
                 Default: 'outputs/output.txt'
 
     --report
-                Writes the metadata from the results into a csv
-                for ease of import into csv editor. Csv
-    --clean
-                Deletes existing output if found. Helpful for
-                running program repeatedly.
+                Writes the metadata from the results into a 
+                csv for ease of import into csv editor. Csv
+                is saved under 'outputs/report.csv' by default.
+    --report-file
+                Outputs the report file at location passed to 
+                flag. Locations should be relative to content 
+                root (e.g. 'outputs/report.csv).
+                Default: 'outputs/report.csv'
     --test
                 Runs all user-defined test cases in the file
-                "inputs/test_input.txt". Test flag overrides
-                input flag if used together.
+                "inputs/TestHashingInput.txt". Test flag 
+                overrides input flag if used together.
 ```
