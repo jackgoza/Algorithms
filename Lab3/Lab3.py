@@ -27,17 +27,17 @@ def generate_lcs_table(x, y):
     return c
 
 
-def walk_lcs_path(matrix, x, y, i, j, curr=''):
+def walk_lcs_path(matrix, x, i, j, curr=''):
     if i == 0 or j == 0:
         return curr
 
-    if x[i-1] == y[j-1]:
-        new_curr = walk_lcs_path(matrix, x, y, i - 1, j - 1, curr)
+    if matrix[i - 1][j] == matrix[i][j - 1] == matrix[i - 1][j - 1]:
+        new_curr = walk_lcs_path(matrix, x, i - 1, j - 1, curr)
         return new_curr + x[i - 1]
     elif matrix[i - 1][j] >= matrix[i][j - 1]:
-        return walk_lcs_path(matrix, x, y, i - 1, j, curr)
+        return walk_lcs_path(matrix, x, i - 1, j, curr)
     else:
-        return walk_lcs_path(matrix, x, y, i, j - 1, curr)
+        return walk_lcs_path(matrix, x, i, j - 1, curr)
 
 
 # https://stackoverflow.com/questions/13214809/pretty-print-2d-list/50257693#50257693
@@ -67,4 +67,4 @@ if __name__ == "__main__":
     pretty_print_matrix(matrix)
     i = len(matrix) - 1
     j = len(matrix[0]) - 1
-    print(walk_lcs_path(matrix, x, y, i, j))
+    print(walk_lcs_path(matrix, x, i, j))
