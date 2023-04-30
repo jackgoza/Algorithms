@@ -30,4 +30,4 @@ if __name__ == "__main__":
     pretty_print_matrix(matrix, list(x)[:], list(y)[:])
     i = len(matrix) - 1
     j = len(matrix[0]) - 1
-    print(walk_lcs_path(matrix, x, y, i, j))
+    print(walk_lcs_path(matrix, x, i, j))
