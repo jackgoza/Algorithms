@@ -30,10 +30,12 @@ def check_and_open_file(filename):
 def parse_file(filename):
     """
     Reads input from provided filename. Validates that file exists and that file contains at least two valid strings for
-    comparison. Strings must be a key:value pair seperated by an = and may not have extra whitespace between lines.
+    comparison. Strings must be a key:value pair seperated by an = and should not have extra whitespace between lines.
+    This function treats extra whitespace / other lines not matching format as ignorable, thus saving us a lot of gross
+    error handling
 
     :param filename: String
-    :return: {}
+    :return: { key1: value1, key2: value2... }
     :throws IOException if file does not exist or is invalid, or if it contains < 2 valid strings
     """
     # check_and_open_file can raise an IOError
@@ -50,6 +52,3 @@ def parse_file(filename):
         raise IOError('Input file did not contain enough strings!')
 
     return returnable
-
-
-# parse_file('/home/jack/src/school/Algorithms/Lab3/inputs/DynamicLabInput.txt')
